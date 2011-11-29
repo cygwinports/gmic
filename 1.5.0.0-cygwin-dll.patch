@@ -47,7 +47,7 @@
  
  gmic_gimp.o: gmic.cpp gmic_def.h
  	$(CC) -o gmic_gimp.o -c gmic.cpp -Dgmic_gimp -Dgmic_minimal -Dgmic_float $(CFLAGS)
-@@ -344,10 +361,16 @@ install:
+@@ -344,6 +361,11 @@ install:
  	cp -f gmic $(DESTDIR)$(USR)/bin/
  	mkdir -p $(DESTDIR)$(USR)/include/
  	cp -f gmic.h $(DESTDIR)$(USR)/include/
@@ -58,7 +58,10 @@
 +else
  ifneq ($(OS),Darwin)
  	mkdir -p $(DESTDIR)$(USR)/lib
- 	cp -f libgmic.so $(DESTDIR)$(USR)/lib/libgmic.so.1
+ 	cp -f libgmic.so $(DESTDIR)$(USR)/lib/libgmic.so.1.5.0.7
+@@ -351,6 +369,7 @@ install:
+ 	ln -s $(DESTDIR)$(USR)/lib/libgmic.so.1.5.0 $(DESTDIR)$(USR)/lib/libgmic.so.1.5
+ 	ln -s $(DESTDIR)$(USR)/lib/libgmic.so.1.5 $(DESTDIR)$(USR)/lib/libgmic.so.1
  endif
 +endif
  	mkdir -p $(DESTDIR)$(USR)/share/man/man1/
