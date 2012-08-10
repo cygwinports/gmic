@@ -1,0 +1,33 @@
+CATEGORY="Graphics"
+SUMMARY="GREYC's Magic Image Converter"
+DESCRIPTION="G'MIC is focused on the design of complex pipelines for
+converting, manipulating, filtering and visualizing generic 1d/2d/3d
+multi-spectral image datasets. Of course, it is able to manage color
+images, but also more complex data as image sequences or 3d volumetric
+datasets."
+HOMEPAGE="http://gmic.sourceforge.net/"
+SRC_URI="mirror://sourceforge/gmic/${PN}_${PV}.tar.gz"
+
+PATCH_URI="01-cygwin-dll.patch
+           02-snprintf.patch"
+
+PKG_NAMES="${PN} gimp-${PN} libgmic1 libgmic-devel"
+gmic_CONTENTS="etc/ usr/bin/gmic.exe usr/share/"
+gimp_gmic_CONTENTS="usr/lib/gimp/"
+libgmic1_SUMMARY="${SUMMARY} library (runtime)"
+libgmic1_CONTENTS="usr/bin/cyggmic-1.dll"
+libgmic_devel_SUMMARY="${SUMMARY} library (development)"
+libgmic_devel_CONTENTS="usr/include/ usr/lib/lib*"
+
+src_compile() {
+	lndirs
+	cd ${B}/src
+	cygmake -j1 linux gimp lib \
+		OS=Cygwin EXE=.exe IS_GCC=yes \
+		OPENCV_LDFLAGS="$(pkg-config --libs opencv)"
+}
+
+src_install() {
+	cd ${B}/src
+	cyginstall OS=Cygwin EXE=.exe
+}

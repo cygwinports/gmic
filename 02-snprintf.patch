@@ -1,0 +1,20 @@
+--- origsrc/gmic-1.5.1.7/src/gmic.cpp	2012-07-26 03:59:34.000000000 -0500
++++ src/gmic-1.5.1.7/src/gmic.cpp	2012-08-10 00:35:08.607483600 -0500
+@@ -10667,7 +10667,7 @@ int main(int argc, char **argv) {
+       *const command = is_help1?is_help1:is_help2?is_help2:is_help3?is_help3:is_help4;
+     if (!std::strcmp(is_help,command)) gmic("-v - -help",images,images_names); // Global help.
+     else { // Help for a specified command.
+-      std::snprintf(command_line,sizeof(command_line),"-v - -help \"%s\",1",command);
++      cimg_snprintf(command_line,sizeof(command_line),"-v - -help \"%s\",1",command);
+       gmic(command_line,images,images_names);
+     }
+     std::exit(0);
+@@ -10686,7 +10686,7 @@ int main(int argc, char **argv) {
+ 		   e.command());
+       images.assign(); images_names.assign();
+       CImg<unsigned char>(data_gmic_def,1,size_data_gmic_def,1,1).move_to(images);
+-      std::snprintf(command_line,sizeof(command_line),"-v - -help \"%s\",0",e.command());
++      cimg_snprintf(command_line,sizeof(command_line),"-v - -help \"%s\",0",e.command());
+       gmic(command_line,images,images_names);
+     } else { std::fprintf(cimg::output(),"\n\n"); std::fflush(cimg::output()); }
+     return -1;

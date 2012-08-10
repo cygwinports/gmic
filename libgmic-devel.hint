@@ -1,9 +1,0 @@
-category: Graphics
-requires: libgmic1 libfftw3-devel
-external-source: gmic
-sdesc: "GREYC's Magic Image Converter library (development)"
-ldesc: "G'MIC is focused on the design of complex pipelines for 
-converting, manipulating, filtering and visualizing generic 1d/2d/3d 
-multi-spectral image datasets. Of course, it is able to manage color 
-images, but also more complex data as image sequences or 3d volumetric 
-datasets."
