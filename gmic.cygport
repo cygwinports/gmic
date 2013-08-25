@@ -1,5 +1,5 @@
 NAME="gmic"
-VERSION=1.5.2.1
+VERSION=1.5.6.1
 RELEASE=1
 CATEGORY="Graphics"
 SUMMARY="GREYC's Magic Image Converter"
@@ -9,16 +9,16 @@ multi-spectral image datasets. Of course, it is able to manage color
 images, but also more complex data as image sequences or 3d volumetric
 datasets."
 HOMEPAGE="http://gmic.sourceforge.net/"
-SRC_URI="mirror://sourceforge/gmic/${PN}_${PV}.tar.gz"
+SRC_URI="mirror://sourceforge/gmic/gmic_${VERSION}.tar.gz"
+PATCH_URI="01-cygwin-dll.patch"
 
-PATCH_URI="01-cygwin-dll.patch
-           02-snprintf.patch"
-
-PKG_NAMES="${PN} gimp-${PN} libgmic1 libgmic-devel"
+PKG_NAMES="gmic gimp-gmic libgmic1 libgmic-devel"
 gmic_CONTENTS="etc/ usr/bin/gmic.exe usr/share/"
 gimp_gmic_CONTENTS="usr/lib/gimp/"
+libgmic1_CATEGORY="Libs"
 libgmic1_SUMMARY="${SUMMARY} library (runtime)"
 libgmic1_CONTENTS="usr/bin/cyggmic-1.dll"
+libgmic_devel_CATEGORY="Libs"
 libgmic_devel_SUMMARY="${SUMMARY} library (development)"
 libgmic_devel_CONTENTS="usr/include/ usr/lib/lib*"
 
