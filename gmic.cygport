@@ -1,5 +1,5 @@
 NAME="gmic"
-VERSION=1.5.7.2
+VERSION=1.6.0.3
 RELEASE=1
 CATEGORY="Graphics"
 SUMMARY="GREYC's Magic Image Converter"
@@ -10,7 +10,10 @@ images, but also more complex data as image sequences or 3d volumetric
 datasets."
 HOMEPAGE="http://gmic.sourceforge.net/"
 SRC_URI="mirror://sourceforge/gmic/gmic_${VERSION}.tar.gz"
-PATCH_URI="01-cygwin-dll.patch"
+PATCH_URI="
+	1.6.0.3-cygwin-dll.patch
+	1.6.0.3-debuginfo.patch
+"
 
 PKG_NAMES="gmic gimp-gmic libgmic1 libgmic-devel"
 gmic_CONTENTS="etc/ usr/bin/gmic.exe usr/share/"
@@ -26,11 +29,12 @@ src_compile() {
 	lndirs
 	cd ${B}/src
 	cygmake -j1 linux gimp lib \
-		OS=Cygwin EXE=.exe IS_GCC=yes \
+		OS=Unix OSTYPE=Cygwin EXE=.exe IS_GCC=yes \
+		OPT_CFLAGS="${CXXFLAGS} -std=gnu++11" \
 		OPENCV_LDFLAGS="$(pkg-config --libs opencv)"
 }
 
 src_install() {
 	cd ${B}/src
-	cyginstall OS=Cygwin EXE=.exe
+	cyginstall OS=Unix OSTYPE=Cygwin EXE=.exe
 }
