@@ -1,0 +1,12 @@
+--- origsrc/gmic-1.6.2.0/src/CImg.h	2015-04-16 08:50:53.000000000 -0500
++++ src/gmic-1.6.2.0/src/CImg.h	2015-04-21 22:29:38.929991300 -0500
+@@ -37902,6 +37902,9 @@ namespace cimg_library_suffixed {
+             if (is_axes) { if (visible_cursor) { disp.hide_mouse(); visible_cursor = false; }}
+             else { if (!visible_cursor) { disp.show_mouse(); visible_cursor = true; }}
+             const int d = (depth()>1)?depth():0;
++#undef _X
++#undef _Y
++#undef _Z
+             int
+               _X = (int)X, _Y = (int)Y, _Z = (int)Z,
+               w = disp.width(), W = width() + d,

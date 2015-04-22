@@ -1,5 +1,5 @@
 NAME="gmic"
-VERSION=1.6.0.3
+VERSION=1.6.2.0
 RELEASE=1
 CATEGORY="Graphics"
 SUMMARY="GREYC's Magic Image Converter"
@@ -11,8 +11,9 @@ datasets."
 HOMEPAGE="http://gmic.sourceforge.net/"
 SRC_URI="mirror://sourceforge/gmic/gmic_${VERSION}.tar.gz"
 PATCH_URI="
-	1.6.0.3-cygwin-dll.patch
-	1.6.0.3-debuginfo.patch
+	1.6.2.0-cygwin-compile.patch
+	1.6.2.0-cygwin-dll.patch
+	1.6.2.0-debuginfo.patch
 "
 
 PKG_NAMES="gmic gimp-gmic libgmic1 libgmic-devel"

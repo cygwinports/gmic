@@ -1,6 +1,6 @@
---- origsrc/gmic-1.6.0.3/src/Makefile	2014-12-19 04:51:53.000000000 -0600
-+++ src/gmic-1.6.0.3/src/Makefile	2015-01-04 14:49:37.020058800 -0600
-@@ -393,12 +393,16 @@ gmic_lib.o: gmic.cpp
+--- origsrc/gmic-1.6.2.0/src/Makefile	2015-04-16 08:50:53.000000000 -0500
++++ src/gmic-1.6.2.0/src/Makefile	2015-04-21 21:48:02.058929000 -0500
+@@ -405,12 +405,16 @@ gmic_lib.o: gmic.cpp
  	$(CC) -o gmic_lib.o -c gmic.cpp -fPIC $(CFLAGS)
  gmic_lib: gmic_lib.o
  	ar rcs libgmic.a gmic_lib.o
@@ -17,7 +17,7 @@
  
  gmic_gimp.o: gmic.cpp CImg.h
  	$(CC) -o gmic_gimp.o -c gmic.cpp $(CFLAGS) -Dgmic_gimp
-@@ -438,6 +442,11 @@ install:
+@@ -451,6 +455,11 @@ install:
  	cp -f gmic $(DESTDIR)$(USR)/$(BIN)/
  	mkdir -p $(DESTDIR)$(USR)/$(INCLUDE)/
  	cp -f gmic.h $(DESTDIR)$(USR)/$(INCLUDE)/
@@ -29,8 +29,8 @@
  ifneq ($(OS),Darwin)
  	mkdir -p $(DESTDIR)$(USR)/share
  	mkdir -p $(DESTDIR)$(USR)/$(LIB)
-@@ -445,6 +454,7 @@ ifneq ($(OS),Darwin)
- 	ln -s libgmic.so.1.6.0 $(DESTDIR)$(USR)/$(LIB)/libgmic.so.1
+@@ -458,6 +466,7 @@ ifneq ($(OS),Darwin)
+ 	ln -s libgmic.so.1.6.2 $(DESTDIR)$(USR)/$(LIB)/libgmic.so.1
  	ln -s libgmic.so.1 $(DESTDIR)$(USR)/$(LIB)/libgmic.so
  endif
 +endif
