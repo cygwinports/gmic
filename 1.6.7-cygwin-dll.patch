@@ -1,0 +1,35 @@
+--- origsrc/gmic-1.6.7/src/Makefile	2015-10-23 07:35:26.000000000 -0500
++++ src/gmic-1.6.7/src/Makefile	2015-10-28 10:49:49.168557300 -0500
+@@ -352,12 +352,17 @@ libgmic.o: gmic.cpp gmic.h gmic_stdlib.h
+ 
+ libgmic: libgmic.o gmic_use_lib.cpp
+ 	ar rcs libgmic.a libgmic.o
++ifeq ($(OSTYPE),Cygwin)
++	$(CC) -shared -Wl,--out-implib,libgmic.dll.a -o cyggmic-1.dll libgmic.o $(LIBS)
++	$(CC) -o gmic_use_lib gmic_use_lib.cpp -L. -lgmic
++else
+ ifeq ($(OS),Darwin)
+ 	$(CC) -shared -o libgmic.so libgmic.o $(LIBS)
+ else
+ 	$(CC) -shared -Wl,-soname,libgmic.so.1 -o libgmic.so libgmic.o $(LIBS)
+ 	$(CC) -o gmic_use_lib gmic_use_lib.cpp -L. -lgmic
+ endif
++endif
+ 
+ gmic_gimp.o: gmic.cpp gmic.h gmic_stdlib.h CImg.h
+ 	$(CC) -o gmic_gimp.o -c gmic.cpp -Dgmic_gimp $(CFLAGS)
+@@ -460,9 +465,14 @@ install:
+ ifneq ($(OS),Darwin)
+ 	mkdir -p $(DESTDIR)$(USR)/share
+ 	mkdir -p $(DESTDIR)$(USR)/$(LIB)
++ifeq ($(OSTYPE),Cygwin)
++	cp -f cyggmic-1.dll $(DESTDIR)$(USR)/$(BIN)/
++	cp -f libgmic.dll.a $(DESTDIR)$(USR)/$(LIB)/
++else
+ 	cp -f libgmic.so $(DESTDIR)$(USR)/$(LIB)/libgmic.so.1.6.7
+ 	ln -fs libgmic.so.1.6.7 $(DESTDIR)$(USR)/$(LIB)/libgmic.so.1
+ 	ln -fs libgmic.so.1 $(DESTDIR)$(USR)/$(LIB)/libgmic.so
++endif
+ 	cp -f ../zart/zart $(DESTDIR)$(USR)/$(BIN)/
+ endif
+ 	mkdir -p $(DESTDIR)$(USR)/share/man/

@@ -1,5 +1,7 @@
+inherit qt4-qmake
+
 NAME="gmic"
-VERSION=1.6.2.0
+VERSION=1.6.7
 RELEASE=1
 CATEGORY="Graphics"
 SUMMARY="GREYC's Magic Image Converter"
@@ -8,16 +10,18 @@ converting, manipulating, filtering and visualizing generic 1d/2d/3d
 multi-spectral image datasets. Of course, it is able to manage color
 images, but also more complex data as image sequences or 3d volumetric
 datasets."
-HOMEPAGE="http://gmic.sourceforge.net/"
-SRC_URI="mirror://sourceforge/gmic/gmic_${VERSION}.tar.gz"
+HOMEPAGE="http://gmic.eu/"
+SRC_URI="http://gmic.eu/files/source/gmic_${VERSION}.tar.gz"
 PATCH_URI="
 	1.6.2.0-cygwin-compile.patch
-	1.6.2.0-cygwin-dll.patch
-	1.6.2.0-debuginfo.patch
+	1.6.7-cygwin-dll.patch
 "
 
-PKG_NAMES="gmic gimp-gmic libgmic1 libgmic-devel"
-gmic_CONTENTS="etc/ usr/bin/gmic.exe usr/share/"
+PKG_NAMES="gmic gmic-zart gimp-gmic libgmic1 libgmic-devel"
+gmic_CONTENTS="etc/ usr/bin/gmic.exe usr/share/doc/gmic/ usr/share/man/"
+gmic_zart_SUMMARY="${SUMMARY} GUI"
+gmic_zart_DOCS="zart/README zart/Licence_CeCILL_V2-en.html"
+gmic_zart_CONTENTS="usr/bin/zart.exe usr/share/applications/ usr/share/pixmaps/"
 gimp_gmic_CONTENTS="usr/lib/gimp/"
 libgmic1_CATEGORY="Libs"
 libgmic1_SUMMARY="${SUMMARY} library (runtime)"
@@ -29,13 +33,18 @@ libgmic_devel_CONTENTS="usr/include/ usr/lib/lib*"
 src_compile() {
 	lndirs
 	cd ${B}/src
-	cygmake -j1 linux gimp lib \
-		OS=Unix OSTYPE=Cygwin EXE=.exe IS_GCC=yes \
-		OPT_CFLAGS="${CXXFLAGS} -std=gnu++11" \
-		OPENCV_LDFLAGS="$(pkg-config --libs opencv)"
+	cygmake -j1 lib cli gimp \
+		OS=Unix OSTYPE=Cygwin EXE=.exe IS_GCC=yes NOSTRIP=1 \
+		OPT_CFLAGS="${CXXFLAGS} -std=gnu++11 -fsigned-char" \
+		FFMPEG_CFLAGS= FFMPEG_LDFLAGS=
+	cd ${B}/zart
+	qt4_qmake_compile
 }
 
 src_install() {
 	cd ${B}/src
 	cyginstall OS=Unix OSTYPE=Cygwin EXE=.exe
+
+	newicon ${S}/zart/images/gmic_hat.png gmic.png
+	make_desktop_entry zart "ZArt" gmic "Graphics;2DGraphics;RasterGraphics"
 }
