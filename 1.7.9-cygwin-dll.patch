@@ -1,0 +1,55 @@
+--- origsrc/gmic-1.7.9/src/Makefile	2016-12-02 05:29:58.000000000 -0600
++++ src/gmic-1.7.9/src/Makefile	2017-05-04 21:32:00.729343300 -0500
+@@ -459,7 +459,11 @@ libgmic: libgmic.o use_libgmic.cpp
+ ifeq ($(OS),Darwin)
+ 	$(CXX) -shared -o libgmic.so libgmic.o $(LIBS)
+ else
++ifeq ($(OSTYPE),Cygwin)
++	$(CXX) -shared -Wl,--out-implib,libgmic.dll.a -o cyggmic-1.dll libgmic.o $(LIBS)
++else
+ 	$(CXX) -shared -Wl,-soname,libgmic.so.1 -o libgmic.so libgmic.o $(LIBS)
++endif
+ 	$(CXX) -o use_libgmic use_libgmic.cpp -L. -lgmic $(LIBS)
+ endif
+ 
+@@ -474,12 +478,16 @@ libcgmic: libgmic.o libcgmic.o
+ ifeq ($(OS),Darwin)
+ 	$(CXX) -shared -o libcgmic.so libcgmic.o libgmic.o $(LIBS)
+ else
++ifeq ($(OSTYPE),Cygwin)
++	$(CXX) -shared -Wl,--out-implib,libcgmic.dll.a -o cyggmic-1.dll libcgmic.o libgmic.o $(LIBS)
++else
+ ifeq ($(OS),Windows)
+ 	$(CXX) -shared -Wl,-soname,libcgmic.so.1 -o libcgmic$(SO) libcgmic.o libgmic.o -Wl,--output-def,libcgmic.def,--out-implib,libcgmic.a $(LIBS)
+ else
+ 	$(CXX) -shared -Wl,-soname,libcgmic.so.1 -o libcgmic$(SO) libcgmic.o libgmic.o $(LIBS)
+ endif
+ endif
++endif
+ 	@if [ ! -f use_libcgmic.c ]; then ln -fs ../../gmic-community/libcgmic/use_libcgmic.c .; fi
+ 	$(CC) -std=c99 -o use_libcgmic use_libcgmic.c -L. -lcgmic
+ 
+@@ -623,6 +631,15 @@ install:
+ ifneq ($(OS),Darwin)
+ 	mkdir -p $(DESTDIR)$(USR)/share
+ 	mkdir -p $(DESTDIR)$(USR)/$(LIB)
++ifeq ($(OSTYPE),Cygwin)
++	cp -f cyggmic-1.dll $(DESTDIR)$(USR)/$(BIN)/
++	cp -f libgmic.dll.a $(DESTDIR)$(USR)/$(LIB)/
++	@if [ -f libcgmic.dll.a ]; then \
++	  cp -f gmic_libc.h $(DESTDIR)$(USR)/$(INCLUDE)/; \
++	  cp -f cygcgmic-1.dll $(DESTDIR)$(USR)/$(BIN)/; \
++	  cp -f libcgmic.dll.a $(DESTDIR)$(USR)/$(LIB)/; \
++        fi
++else
+ 	cp -f libgmic.so $(DESTDIR)$(USR)/$(LIB)/libgmic.so.1.7.9
+ 	ln -fs libgmic.so.1.7.9 $(DESTDIR)$(USR)/$(LIB)/libgmic.so.1
+ 	ln -fs libgmic.so.1 $(DESTDIR)$(USR)/$(LIB)/libgmic.so
+@@ -632,6 +649,7 @@ ifneq ($(OS),Darwin)
+           ln -fs libcgmic.so.1.7.9 $(DESTDIR)$(USR)/$(LIB)/libcgmic.so.1 ; \
+           ln -fs libcgmic.so.1 $(DESTDIR)$(USR)/$(LIB)/libcgmic.so; \
+         fi
++endif
+ 	@if [ -f ../zart/zart ]; then \
+ 	  cp -f ../zart/zart $(DESTDIR)$(USR)/$(BIN)/; \
+         fi

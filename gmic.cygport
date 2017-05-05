@@ -1,7 +1,7 @@
 inherit qt4-qmake
 
 NAME="gmic"
-VERSION=1.6.7
+VERSION=1.7.9
 RELEASE=1
 CATEGORY="Graphics"
 SUMMARY="GREYC's Magic Image Converter"
@@ -12,15 +12,16 @@ images, but also more complex data as image sequences or 3d volumetric
 datasets."
 HOMEPAGE="http://gmic.eu/"
 SRC_URI="http://gmic.eu/files/source/gmic_${VERSION}.tar.gz"
+commit1=fd889db3309c268f77d8bfb6df977427f946fef3
+SRC_URI+=" https://github.com/dtschump/gmic-community/archive/${commit1}/gmic-community-${commit1}.tar.gz"
 PATCH_URI="
 	1.6.2.0-cygwin-compile.patch
-	1.6.7-cygwin-dll.patch
+	1.7.9-cygwin-dll.patch
 "
 
 PKG_NAMES="gmic gmic-zart gimp-gmic libgmic1 libgmic-devel"
 gmic_CONTENTS="etc/ usr/bin/gmic.exe usr/share/doc/gmic/ usr/share/man/"
 gmic_zart_SUMMARY="${SUMMARY} GUI"
-gmic_zart_DOCS="zart/README zart/Licence_CeCILL_V2-en.html"
 gmic_zart_CONTENTS="usr/bin/zart.exe usr/share/applications/ usr/share/pixmaps/"
 gimp_gmic_CONTENTS="usr/lib/gimp/"
 libgmic1_CATEGORY="Libs"
@@ -37,14 +38,20 @@ src_compile() {
 		OS=Unix OSTYPE=Cygwin EXE=.exe IS_GCC=yes NOSTRIP=1 \
 		OPT_CFLAGS="${CXXFLAGS} -std=gnu++11 -fsigned-char" \
 		FFMPEG_CFLAGS= FFMPEG_LDFLAGS=
+	mkdir -p ${B}/zart
 	cd ${B}/zart
-	qt4_qmake_compile
+	lndirs ${S}/../gmic-community-${commit1}/zart
+	cygqmake4 GMIC_PATH=../src
+	cygmake
 }
 
 src_install() {
 	cd ${B}/src
 	cyginstall OS=Unix OSTYPE=Cygwin EXE=.exe
 
-	newicon ${S}/zart/images/gmic_hat.png gmic.png
+	newicon ../zart/images/gmic_hat.png gmic.png
 	make_desktop_entry zart "ZArt" gmic "Graphics;2DGraphics;RasterGraphics"
+	docinto gmic-zart
+	dodoc ../zart/README ../zart/Licence_CeCILL_V2-en.html
+
 }
