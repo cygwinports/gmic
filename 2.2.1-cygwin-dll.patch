@@ -1,0 +1,57 @@
+--- origsrc/gmic/src/Makefile	2018-03-12 07:24:11.000000000 -0500
++++ src/gmic/src/Makefile	2018-04-10 18:23:16.336266100 -0500
+@@ -130,6 +130,11 @@ EXE = .exe
+ SO = .dll
+ PIC =
+ endif
++ifeq ($(OSTYPE),Cygwin)
++EXE = .exe
++SO = -$(VERSION1).dll
++PIC =
++endif
+ 
+ ifneq (,$(wildcard ../../gmic/src))
+ ZART_GMIC_PATH=../gmic/src
+@@ -437,7 +442,11 @@ _lib: libgmic.o use_libgmic.cpp
+ ifeq ($(OS),Darwin)
+ 	$(CXX) -shared -o libgmic.so libgmic.o $(LIBS)
+ else
++ifeq ($(OSTYPE),Cygwin)
++	$(CXX) -shared -Wl,--out-implib,libgmic.dll.a -o cyggmic-$(VERSION1).dll libgmic.o $(LIBS)
++else
+ 	$(CXX) -shared -Wl,-soname,libgmic.so.$(VERSION1) -o libgmic.so libgmic.o $(LIBS)
++endif
+ 	$(CXX) -o use_libgmic use_libgmic.cpp -L. -lgmic $(LIBS)
+ endif
+ 
+@@ -470,11 +479,15 @@ ifeq ($(OS),Darwin)
+ 	$(CXX) -shared -o libcgmic.so libcgmic.o libgmic.o $(LIBS)
+ else
+ ifeq ($(OS),Windows)
+-	$(CXX) -shared -Wl,-soname,libcgmic.so.$(VERSION1) -o libcgmic$(SO) libcgmic.o libgmic.o -Wl,--output-def,libcgmic.def,--out-implib,libcgmic.a $(LIBS)
++	$(CXX) -shared -Wl,-soname,libcgmic.so.$(VERSION1) -o cgmic$(SO) libcgmic.o libgmic.o -Wl,--output-def,libcgmic.def,--out-implib,libcgmic.a $(LIBS)
++else
++ifeq ($(OSTYPE),Cygwin)
++	$(CXX) -shared -Wl,--out-implib,libcgmic.dll.a -o cygcgmic$(SO) libcgmic.o libgmic.o $(LIBS)
+ else
+ 	$(CXX) -shared -Wl,-soname,libcgmic.so.$(VERSION1) -o libcgmic$(SO) libcgmic.o libgmic.o $(LIBS)
+ endif
+ endif
++endif
+ 	$(CC) -std=c99 -o use_libcgmic use_libcgmic.c -L. -lcgmic
+ 
+ libcgmic.o: check_versions gmic.cpp gmic.h gmic_stdlib.h CImg.h
+@@ -528,9 +541,13 @@ else
+ ifeq ($(OS),Windows)
+ 	$(CXX) -shared -static -Wl,-soname,libcgmicstatic.so.$(VERSION1) -o libcgmicstatic$(SO) libcgmicstatic.o libgmic.o $(PIC) -Wl,--output-def,libcgmicstatic.def,--out-implib,libcgmicstatic.a $(CFLAGS) $(LIBS)
+ else
++ifeq ($(OSTYPE),Cygwin)
++	$(CXX) -shared -static -Wl,--out-implib,libcgmicstatic.dll.a -o cygcgmicstatic$(SO) libcgmicstatic.o libgmic.o $(PIC) $(CFLAGS) $(LIBS)
++else
+ 	$(CXX) -shared -Wl,-soname,libcgmicstatic.so.$(VERSION1) -o libcgmicstatic$(SO) libcgmicstatic.o libgmic.o $(PIC) $(CFLAGS) $(LIBS)
+ endif
+ endif
++endif
+ 	$(CC) -std=c99 -o use_libcgmic_static use_libcgmic.c -L. -lcgmicstatic
+ 
+ libcgmicstatic.o: check_versions gmic.cpp gmic.h gmic_stdlib.h CImg.h

@@ -1,7 +1,7 @@
-inherit qt4-qmake
+inherit qt5-qmake
 
 NAME="gmic"
-VERSION=1.7.9
+VERSION=2.2.1
 RELEASE=1
 CATEGORY="Graphics"
 SUMMARY="GREYC's Magic Image Converter"
@@ -12,46 +12,95 @@ images, but also more complex data as image sequences or 3d volumetric
 datasets."
 HOMEPAGE="http://gmic.eu/"
 SRC_URI="http://gmic.eu/files/source/gmic_${VERSION}.tar.gz"
-commit1=fd889db3309c268f77d8bfb6df977427f946fef3
+commit1=c8556dfc7e902439c6a379c1c883b28e03a49eca
 SRC_URI+=" https://github.com/dtschump/gmic-community/archive/${commit1}/gmic-community-${commit1}.tar.gz"
+commit2=v.${VERSION}
+SRC_URI+=" https://github.com/c-koi/gmic-qt/archive/${commit2}/gmic-qt-${commit2}.tar.gz"
+commit3=34f7e483a819dd2af4f772d0f748928119f22f6d
+SRC_URI+=" https://github.com/c-koi/zart/archive/${commit3}/zart-${commit3}.tar.gz"
+SRC_DIR=.
 PATCH_URI="
-	1.6.2.0-cygwin-compile.patch
-	1.7.9-cygwin-dll.patch
+	2.2.1-cygwin-dll.patch
+	2.2.1-cygwin-syscall.patch
+	2.2.1-cygwin-x11.patch
+	2.2.1-no-strip.patch
 "
 
-PKG_NAMES="gmic gmic-zart gimp-gmic libgmic1 libgmic-devel"
-gmic_CONTENTS="etc/ usr/bin/gmic.exe usr/share/doc/gmic/ usr/share/man/"
+PKG_NAMES="gmic gmic-zart gimp-gmic libgmic2 libgmic-devel libcgmic2 libcgmic-devel"
+gmic_CONTENTS="
+	etc/bash_completion.d/gmic
+	usr/bin/gmic.exe
+	usr/share/doc/gmic/
+	usr/share/man/man1/gmic.1*
+"
 gmic_zart_SUMMARY="${SUMMARY} GUI"
-gmic_zart_CONTENTS="usr/bin/zart.exe usr/share/applications/ usr/share/pixmaps/"
-gimp_gmic_CONTENTS="usr/lib/gimp/"
-libgmic1_CATEGORY="Libs"
-libgmic1_SUMMARY="${SUMMARY} library (runtime)"
-libgmic1_CONTENTS="usr/bin/cyggmic-1.dll"
+gmic_zart_CONTENTS="
+	usr/bin/zart.exe
+	usr/share/applications/zart.desktop
+	usr/share/doc/gmic-zart/
+	usr/share/pixmaps/gmic.png
+"
+gimp_gmic_CONTENTS="
+	usr/lib/gimp/2.0/plug-ins/
+	usr/share/doc/gimp-gmic/
+"
+libgmic2_CATEGORY="Libs"
+libgmic2_SUMMARY="${SUMMARY} library (runtime)"
+libgmic2_CONTENTS="usr/bin/cyggmic-2.dll"
 libgmic_devel_CATEGORY="Libs"
 libgmic_devel_SUMMARY="${SUMMARY} library (development)"
-libgmic_devel_CONTENTS="usr/include/ usr/lib/lib*"
+libgmic_devel_CONTENTS="usr/include/gmic.h usr/lib/libgmic.dll.a"
+libcgmic2_CATEGORY="Libs"
+libcgmic2_SUMMARY="${SUMMARY} C API (runtime)"
+libcgmic2_CONTENTS="usr/bin/cygcgmic-2.dll"
+libcgmic_devel_CATEGORY="Libs"
+libcgmic_devel_SUMMARY="${SUMMARY} C API (development)"
+libcgmic_devel_CONTENTS="usr/include/gmic_libc.h usr/lib/libcgmic.dll.a"
+
+CYGPORT_USE_UNSTABLE_API=1
+src_unpack_hook() {
+	find gmic{,-community,-qt} zart -delete || :
+	mv gmic-${VERSION} gmic
+	mv gmic-community-${commit1} gmic-community
+	mv gmic-qt-${commit2} gmic-qt
+	mv zart-${commit3} zart
+}
 
 src_compile() {
 	lndirs
-	cd ${B}/src
-	cygmake -j1 lib cli gimp \
-		OS=Unix OSTYPE=Cygwin EXE=.exe IS_GCC=yes NOSTRIP=1 \
-		OPT_CFLAGS="${CXXFLAGS} -std=gnu++11 -fsigned-char" \
+	cd ${B}/gmic/src
+	cygmake -j1 lib libc cli \
+		OS=Unix OSTYPE=Cygwin IS_GCC=yes NOSTRIP=1 WGET=false \
+		OPT_CFLAGS="${CXXFLAGS} -D_DEFAULT_SOURCE -fsigned-char" \
 		FFMPEG_CFLAGS= FFMPEG_LDFLAGS=
-	mkdir -p ${B}/zart
+	cd ${B}/gmic-qt
+	cygqmake5 GMIC_PATH=../gmic/src HOST=gimp
+	cygmake
 	cd ${B}/zart
-	lndirs ${S}/../gmic-community-${commit1}/zart
-	cygqmake4 GMIC_PATH=../src
+	cygqmake5 GMIC_PATH=../gmic/src
 	cygmake
 }
 
 src_install() {
-	cd ${B}/src
-	cyginstall OS=Unix OSTYPE=Cygwin EXE=.exe
+	cd ${B}/gmic/src
+	dobin cyg{,c}gmic-2.dll gmic.exe
+	doinclude gmic.h gmic_libc.h
+	dolib lib{,c}gmic.dll.a
+	doman ../man/gmic.1.gz
+	insinto /etc/bash_completion.d
+	newins ../resources/gmic_bashcompletion.sh gmic
+	dodoc ../COPYING ../README
 
-	newicon ../zart/images/gmic_hat.png gmic.png
+	cd ${B}/gmic-qt
+	exeinto $(gimptool-2.0 --gimpplugindir)/plug-ins
+	doexe gmic_gimp_qt.exe ../gmic/resources/gmic_film_cluts.gmz
+	docinto /gimp-gmic
+	dodoc COPYING README.md
+
+	cd ${B}/zart
+	dobin zart.exe
+	newicon images/gmic_hat.png gmic.png
 	make_desktop_entry zart "ZArt" gmic "Graphics;2DGraphics;RasterGraphics"
-	docinto gmic-zart
-	dodoc ../zart/README ../zart/Licence_CeCILL_V2-en.html
-
+	docinto /gmic-zart
+	dodoc README Licence_CeCILL_V2-en.html
 }

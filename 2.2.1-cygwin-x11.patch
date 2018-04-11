@@ -1,0 +1,11 @@
+--- origsrc/gmic-qt/gmic_qt.pro	2018-03-01 10:17:57.000000000 -0600
++++ src/gmic-qt/gmic_qt.pro	2018-04-10 19:26:58.047635400 -0500
+@@ -133,7 +133,7 @@ win32 {
+  DEFINES += cimg_display=2
+ }
+ 
+-linux {
++linux|cygwin-* {
+   DEFINES += _IS_LINUX_
+   PKGCONFIG += x11
+   message( Linux platform )

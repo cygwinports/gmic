@@ -1,0 +1,12 @@
+--- origsrc/gmic-qt/gmic_qt.pro	2018-04-10 19:42:31.448475000 -0500
++++ src/gmic-qt/gmic_qt.pro	2018-04-10 20:59:01.410877500 -0500
+@@ -369,8 +369,7 @@ translations/zh_tw.ts
+ 
+ # PRE_TARGETDEPS +=
+ 
+-QMAKE_CXXFLAGS_RELEASE += -O3 -s
+-QMAKE_LFLAGS_RELEASE += -s
++QMAKE_CXXFLAGS_RELEASE += -O3
+ QMAKE_CXXFLAGS_DEBUG += -Dcimg_verbosity=3
+ 
+ unix { DEFINES += cimg_use_vt100 }

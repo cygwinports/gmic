@@ -1,0 +1,32 @@
+--- origsrc/gmic/src/gmic.cpp	2018-03-12 07:24:12.000000000 -0500
++++ src/gmic/src/gmic.cpp	2018-04-10 18:27:04.469485200 -0500
+@@ -2226,7 +2226,7 @@ CImgList<void*> gmic::list_p_is_abort =
+ bool *gmic::abort_ptr(bool *const p_is_abort) {
+ #if defined(__MACOSX__) || defined(__APPLE__)
+   void* tid = (void*)(cimg_ulong)getpid();
+-#elif cimg_OS==1
++#elif cimg_OS==1 && !defined(__CYGWIN__)
+   void* tid = (void*)(cimg_ulong)syscall(SYS_gettid);
+ #elif cimg_OS==2
+   void* tid = (void*)(cimg_ulong)GetCurrentThreadId();
+@@ -2559,7 +2559,7 @@ gmic::~gmic() {
+   cimg::mutex(21);
+ #if defined(__MACOSX__) || defined(__APPLE__)
+   void* tid = (void*)(cimg_ulong)getpid();
+-#elif cimg_OS==1
++#elif cimg_OS==1 && !defined(__CYGWIN__)
+   void* tid = (void*)(cimg_ulong)syscall(SYS_gettid);
+ #elif cimg_OS==2
+   void* tid = (void*)(cimg_ulong)GetCurrentThreadId();
+--- origsrc/gmic/src/gmic.h	2018-03-12 07:24:11.000000000 -0500
++++ src/gmic/src/gmic.h	2018-04-10 18:25:25.672977700 -0500
+@@ -205,7 +205,9 @@ inline double gmic_mp_ext(char *const st
+ #elif cimg_OS==1
+ #include <cerrno>
+ #include <sys/resource.h>
++#ifndef __CYGWIN__
+ #include <sys/syscall.h>
++#endif
+ #include <signal.h>
+ #endif // #if cimg_OS==2
+ 
